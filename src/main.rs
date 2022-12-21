@@ -1,4 +1,5 @@
 mod page;
+use actix_files::Files;
 use actix_web::{middleware, post, web, App, HttpResponse, HttpServer, Responder};
 use env_logger::Env;
 use page::index;
@@ -23,8 +24,12 @@ async fn main() -> std::io::Result<()> {
     env_logger::init();
 
     HttpServer::new(|| {
+        let tera =
+            tera::Tera::new(concat!(env!("CARGO_MANIFEST_DIR"), "/templates/**/*.html")).unwrap();
         App::new()
+            .app_data(web::Data::new(tera))
             .wrap(middleware::Logger::default())
+            .service(Files::new("/public", "static"))
             .service(index::index_resourse())
             .service(echo)
             .route("/hey", web::get().to(manual_hello))
