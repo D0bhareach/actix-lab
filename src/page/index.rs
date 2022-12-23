@@ -1,6 +1,5 @@
-use actix_web::{error, web, Error, HttpResponse, Resource, Responder, Result};
+use actix_web::{error, web, Error, Responder, Result, Scope};
 use actix_web_lab::respond::Html;
-use tera::Tera;
 
 async fn hello(tmpl: web::Data<tera::Tera>) -> Result<impl Responder, Error> {
     let mut ctx = tera::Context::new();
@@ -16,6 +15,7 @@ async fn hello(tmpl: web::Data<tera::Tera>) -> Result<impl Responder, Error> {
     Ok(Html(res))
 }
 
-pub fn index_resourse() -> Resource {
-    return Resource::new("/").name("index").route(web::get().to(hello));
+pub fn index_scope() -> Scope {
+    web::scope("/").service(web::resource("").route(web::get().to(hello)))
+    // Resource::new("/").name("index").route(web::get().to(hello))
 }

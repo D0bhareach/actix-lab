@@ -1,8 +1,11 @@
 mod page;
+mod error;
 use actix_files::Files;
-use actix_web::{middleware, post, web, App, HttpResponse, HttpServer, Responder};
-use env_logger::Env;
-use page::index;
+use actix_web::{middleware, post, web, App, HttpResponse, HttpServer, Responder,
+    http::StatusCode
+};
+use page::{index, error as err};
+use error::handler::not_found_handler;
 // TODO:
 // create pages modules: index, user, login, error.
 // in modules create services and attach middleware for wrapping tera render to responce
@@ -24,13 +27,17 @@ async fn main() -> std::io::Result<()> {
     env_logger::init();
 
     HttpServer::new(|| {
+        // there is one more instance of tera with exact the same settings in handlers for errors
         let tera =
             tera::Tera::new(concat!(env!("CARGO_MANIFEST_DIR"), "/templates/**/*.html")).unwrap();
         App::new()
             .app_data(web::Data::new(tera))
+            .wrap(middleware::ErrorHandlers::new()
+                .handler(StatusCode::NOT_FOUND, not_found_handler),)
             .wrap(middleware::Logger::default())
             .service(Files::new("/public", "static"))
-            .service(index::index_resourse())
+            .service(index::index_scope())
+            .service(err::error_scope())
             .service(echo)
             .route("/hey", web::get().to(manual_hello))
     })
