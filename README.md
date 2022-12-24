@@ -1,7 +1,7 @@
 ## Agenda
 I would like to try Actix Framework. The server I would like to build must have:
-* Templeate responce.
-* Redirection on common Errors.
-* User sessions.
+* Templates.
+* Redirection on Errors.
+* Sessions.
 * Error Logging System.
 * Cookies
