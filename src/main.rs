@@ -4,7 +4,7 @@ use actix_files::Files;
 use actix_web::{middleware, post, web, App, HttpResponse, HttpServer, Responder,
     http::StatusCode
 };
-use page::{index, error as err};
+use page::{index, error as err, login};
 use error::handler::not_found_handler;
 // TODO:
 // create pages modules: index, user, login, error.
@@ -37,6 +37,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(middleware::Logger::default())
             .service(Files::new("/public", "static"))
             .service(index::index_scope())
+            .service(login::login_scope())
             .service(err::error_scope())
             .service(echo)
             .route("/hey", web::get().to(manual_hello))

@@ -1,4 +1,5 @@
-use actix_web::{error, web, Error, Responder, Result, Scope};
+use crate::error::ActixLabError;
+use actix_web::{web, Error, Responder, Result, Scope};
 use actix_web_lab::respond::Html;
 
 async fn hello(tmpl: web::Data<tera::Tera>) -> Result<impl Responder, Error> {
@@ -9,7 +10,7 @@ async fn hello(tmpl: web::Data<tera::Tera>) -> Result<impl Responder, Error> {
     ctx.insert("text", "Welcome!");
     let res = tmpl.render("index.html", &ctx).map_err(|e| {
         log::error!("{}", e);
-        error::ErrorInternalServerError("Template error")
+        ActixLabError::TemplateError(e)
     })?;
 
     Ok(Html(res))
@@ -17,5 +18,4 @@ async fn hello(tmpl: web::Data<tera::Tera>) -> Result<impl Responder, Error> {
 
 pub fn index_scope() -> Scope {
     web::scope("/").service(web::resource("").route(web::get().to(hello)))
-    // Resource::new("/").name("index").route(web::get().to(hello))
 }
