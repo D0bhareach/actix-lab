@@ -43,3 +43,30 @@ Result<ErrorHandlerResponse<B>> {
     
 
 }
+
+pub fn internal_error_handler<B>(res: dev::ServiceResponse<B>) -> 
+Result<ErrorHandlerResponse<B>> {
+        // default response in case if tera won't work.
+        let mut response_string = String::from(r#"
+            <body>
+                <p>Severe Internal Server Error.</p>
+            </body>
+        "#);
+
+        let new_req = res.request().clone();
+        let tera = TERA.clone();
+            if let Ok(tmpl) = tera.render("500.html", &tera::Context::new()){
+                response_string = tmpl;
+            } else {
+                // TODO: will need to log in logging file.
+                // Do I really need this else block?
+                log::error!("Can not render tera template from file")
+            }
+        let new_res = HttpResponseBuilder::new(StatusCode::OK).body(response_string);
+
+        let res = ServiceResponse::new(new_req, new_res.map_into_right_body());
+
+        Ok(ErrorHandlerResponse::Response(res))
+    
+
+}

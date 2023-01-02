@@ -7,17 +7,6 @@ pub enum ActixLabError {
     #[error("actix_lab template error")]
     TemplateError(#[from]tera::Error),
 }
-/*
-impl std::fmt::Display for ActixLabError {
-
-}
-
-impl std::error::Error for ActixLabError {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        Some(&self.0)
-    }
-}
-*/
 use actix_web::http::StatusCode; 
 
 impl ResponseError for ActixLabError {
