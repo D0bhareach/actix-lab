@@ -1,6 +1,7 @@
 mod error;
 mod page;
 use actix_files::Files;
+use actix_session::{storage::CookieSessionStore, Session, SessionMiddleware};
 use actix_web::{
     http::StatusCode, middleware, post, web, App, HttpResponse, HttpServer, Responder,
 };
@@ -62,6 +63,8 @@ async fn main() -> std::io::Result<()> {
     // env_logger::init_from_env(Env::default().default_filter_or("info"));
     env_logger::init();
     let tls_config = load_rustls_config();
+    const cookie_key: &str = "BX+1s/Og8J7tiPoIBCNvuTIsCL4ehZZRsCt0f9AVvd/dIPGKu4Zu63/OWO87l5M3
+ldnMsWhJRWvgZfdMZ6ZvYQ==";
 
     HttpServer::new(|| {
         // there is one more instance of tera with exact the same settings in handlers for errors
@@ -69,6 +72,14 @@ async fn main() -> std::io::Result<()> {
             tera::Tera::new(concat!(env!("CARGO_MANIFEST_DIR"), "/templates/**/*.html")).unwrap();
         App::new()
             .app_data(web::Data::new(tera))
+            .wrap(
+                SessionMiddleware::builder(
+                    CookieSessionStore::default(),
+                    Key::from(cookie_key.as_bytes()),
+                )
+                .cookie_secure(true)
+                .build(),
+            )
             .wrap(
                 middleware::ErrorHandlers::new()
                     .handler(StatusCode::NOT_FOUND, not_found_handler)
