@@ -3,10 +3,10 @@
 <p>Please login to continue.</p>
 
       {%if message %}
-         <p>{% if kind %}{{kind}}: {% endif%}{{ message }}</p>
+         <p class="error">{% if kind %}{{kind}}: {% endif%}{{ message }}</p>
       {% endif %}
 
-      <form action="/session/login" method="post" accept-charset="utf-8">
+      <form action="/session/login" method="post" accept-charset="utf-8" enctype="application/x-www-form-urlencoded">
          <label for="username">username</label>
          <input type="text" name="username" id="username" value="" />
          <label for="password">password</label>

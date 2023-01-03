@@ -16,14 +16,17 @@ ul.nav{
     text-decoration: none;
     font-size: 1.1rem;
     font-weight: 500;
-    color: black;
+    color: blue;
 }
 .nav a:hover{
-    color: blue;
+    color: purple;
 }
 .nav li {
     position: relative;
     float: left;
     top: -0.5rem;
     margin-left: 1.2rem;
+}
+p.error {
+    color: orange;
 }
