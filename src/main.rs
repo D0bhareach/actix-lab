@@ -2,9 +2,11 @@ mod error;
 mod page;
 use actix_files::Files;
 use actix_identity::IdentityMiddleware;
-use actix_session::{storage::CookieSessionStore, SessionMiddleware};
+use actix_session::{
+    config::{TtlExtensionPolicy,PersistentSession},
+    storage::CookieSessionStore, SessionMiddleware};
 use actix_web::{
-    cookie::Key, http::StatusCode, middleware, post, web, App, HttpResponse, HttpServer, Responder,
+    cookie::{time::Duration, Key}, http::StatusCode, middleware, post, web, App, HttpResponse, HttpServer, Responder,
 };
 use error::handler::{internal_error_handler, not_found_handler};
 use page::{error as err, index, login};
@@ -66,6 +68,7 @@ async fn main() -> std::io::Result<()> {
     let tls_config = load_rustls_config();
     const COOKIE_KEY: &str = "BX+1s/Og8J7tiPoIBCNvuTIsCL4ehZZRsCt0f9AVvd/dIPGKu4Zu63/OWO87l5M3
 ldnMsWhJRWvgZfdMZ6ZvYQ==";
+    const SESSION_TTL: i64 = 60 * 3;
 
     HttpServer::new(|| {
         // there is one more instance of tera with exact the same settings in handlers for errors
@@ -78,6 +81,11 @@ ldnMsWhJRWvgZfdMZ6ZvYQ==";
                 SessionMiddleware::builder(
                     CookieSessionStore::default(),
                     Key::from(COOKIE_KEY.as_bytes()),
+                )
+                .session_lifecycle(
+                    PersistentSession::default()
+                    .session_ttl(Duration::seconds(SESSION_TTL))
+                    .session_ttl_extension_policy(TtlExtensionPolicy::OnEveryRequest)
                 )
                 .cookie_secure(true)
                 .build(),
