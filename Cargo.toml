@@ -17,3 +17,5 @@ thiserror = "1"
 rustls = "0.20.7"
 rustls-pemfile = "1"
 serde={version="1", features=["derive"]}
+actix-identity="0.5"
+actix-session={version="0.7", features=["cookie-session"]}

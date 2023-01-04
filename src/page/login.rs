@@ -1,10 +1,12 @@
-use std::collections::HashMap;
-
 use crate::error::ActixLabError;
-use actix_web::{http::StatusCode, middleware, web, Error, HttpResponse, Responder, Result, Scope};
+use actix_identity::Identity;
+use actix_web::{
+    http::StatusCode, middleware, web, Error, HttpMessage as _, HttpRequest, HttpResponse, Responder, Result, Scope,
+};
 use actix_web_lab::respond::Html;
 use log;
 use serde::Deserialize;
+use std::collections::HashMap;
 
 // login_post to get user from somewhere and set session
 // in case of an error load page from template and add context.
@@ -33,8 +35,11 @@ async fn login(tmpl: web::Data<tera::Tera>) -> Result<impl Responder, Error> {
     Ok(Html(render_login_page(tmpl, None)?))
 }
 
-async fn logout(_tmpl: web::Data<tera::Tera>) -> Result<impl Responder, Error> {
-    Ok("Logged out.")
+async fn logout(_tmpl: web::Data<tera::Tera>, user: Identity) -> Result<impl Responder, Error> {
+    user.logout();
+        Ok(HttpResponse::Found()
+            .append_header(("Location", "/"))
+            .finish())
 }
 
 #[derive(Deserialize)]
@@ -57,12 +62,14 @@ fn check_user(form: web::Form<LoginForm>) -> bool {
 }
 
 async fn login_post(
-    // when success must create Session.
+    req: HttpRequest,
     form: web::Form<LoginForm>,
     t: web::Data<tera::Tera>,
 ) -> Result<impl Responder, Error> {
     // validate user input if success go to index page.
+    let id = form.username.clone();
     if check_user(form) {
+        Identity::login(&req.extensions(), id).unwrap();
         return Ok(HttpResponse::Found()
             .append_header(("Location", "/"))
             .finish());
