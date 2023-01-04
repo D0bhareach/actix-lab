@@ -4,8 +4,12 @@ use thiserror::Error as ThisError;
 
 #[derive(Debug, ThisError)]
 pub enum ActixLabError {
-    #[error("actix_lab template error")]
+    #[error("actix_lab tera template error")]
     TemplateError(#[from] tera::Error),
+    // #[error("actix-identity error while login")]
+    // IdentityLoginError,
+    #[error("Other severe system error")]
+    Other(#[from] anyhow::Error),
 }
 use actix_web::http::StatusCode;
 
@@ -17,7 +21,10 @@ impl ResponseError for ActixLabError {
               ActixLabError::DatabaseError(_)
             | ActixLabError::StoreTokenError(_)
             */
-            ActixLabError::TemplateError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ActixLabError::Other(_)
+            // | ActixLabError::IdentityLoginError
+            | ActixLabError::TemplateError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+    
         }
     }
 

@@ -1,5 +1,6 @@
 use crate::error::ActixLabError;
 use actix_identity::Identity;
+use actix_session::Session;
 use actix_web::{
     http::StatusCode, middleware, web, Error, HttpMessage as _, HttpRequest, HttpResponse, Responder, Result, Scope,
 };
@@ -65,11 +66,19 @@ async fn login_post(
     req: HttpRequest,
     form: web::Form<LoginForm>,
     t: web::Data<tera::Tera>,
+    session: Session
 ) -> Result<impl Responder, Error> {
-    // validate user input if success go to index page.
+    // TODO: validate user input if success go to index page.
     let id = form.username.clone();
     if check_user(form) {
-        Identity::login(&req.extensions(), id).unwrap();
+
+        #[allow(clippy::redundant_closure)]
+        Identity::login(&req.extensions(), "Session ID".into())
+        .map_err(|e|ActixLabError::Other(e))?;
+        #[allow(clippy::redundant_closure)]
+        let _ = session.insert("username", id)
+        .map_err(|e| ActixLabError::Other(anyhow::anyhow!("Can not insert username in session. {}", e)));
+
         return Ok(HttpResponse::Found()
             .append_header(("Location", "/"))
             .finish());

@@ -1,17 +1,26 @@
 use crate::error::ActixLabError;
 use actix_identity::Identity;
+use actix_session::Session;
 use actix_web::{web, Error, Responder, Result, Scope};
 use actix_web_lab::respond::Html;
 
-async fn hello(tmpl: web::Data<tera::Tera>, user: Option<Identity>) -> Result<impl Responder, Error> {
+async fn hello(
+    tmpl: web::Data<tera::Tera>,
+    user: Option<Identity>,
+    session: Session,
+) -> Result<impl Responder, Error> {
     let mut ctx = tera::Context::new();
-    if let Some(user) = user {
-    // anyhow.error
-    ctx.insert("name", &user.id().unwrap());
-    ctx.insert("logged", &true);
-    }else {
-    ctx.insert("name", "Actix");
-    };
+    let username: String = session
+        .get("username")
+        .unwrap_or_else(|_| Some("Actix".into()))
+        .unwrap_or_else(|| "Ananymous".into());
+
+    if let Some(_user) = user {
+        // toggle login / logout button in navigation.
+        ctx.insert("logged", &true);
+    }
+
+    ctx.insert("name", &username);
     ctx.insert("title", "Index Page");
     ctx.insert("items", &["templates", "middleware", "cookies"]);
     ctx.insert("text", "Welcome!");

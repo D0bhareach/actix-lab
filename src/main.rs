@@ -6,26 +6,16 @@ use actix_session::{
     config::{TtlExtensionPolicy,PersistentSession},
     storage::CookieSessionStore, SessionMiddleware};
 use actix_web::{
-    cookie::{time::Duration, Key}, http::StatusCode, middleware, post, web, App, HttpResponse, HttpServer, Responder,
+    cookie::{time::Duration, Key}, http::StatusCode, middleware, web, App, HttpServer,
 };
 use error::handler::{internal_error_handler, not_found_handler};
+// Errors have different behaviour.
 use page::{error as err, index, login};
 use rustls::{Certificate, PrivateKey, ServerConfig};
 use rustls_pemfile::{certs, pkcs8_private_keys};
 use std::{fs::File, io::BufReader};
 
-// TODO: Add Sessions
-// TODO: Add Cookie Middleware. For Session Persistence.
 // TODO: add redis for holding session data.
-
-#[post("/echo")]
-async fn echo(req_body: String) -> impl Responder {
-    HttpResponse::Ok().body(req_body)
-}
-
-async fn manual_hello() -> impl Responder {
-    HttpResponse::Ok().body("Hey there!")
-}
 
 fn load_rustls_config() -> rustls::ServerConfig {
     // init server config builder with safe defaults
@@ -100,8 +90,6 @@ ldnMsWhJRWvgZfdMZ6ZvYQ==";
             .service(index::index_scope())
             .service(login::login_scope().wrap(login::default_headers()))
             .service(err::error_scope())
-            .service(echo)
-            .route("/hey", web::get().to(manual_hello))
     })
     .bind_rustls("127.0.0.1:8443", tls_config)?
     .run()
