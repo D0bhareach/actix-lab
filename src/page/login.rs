@@ -33,6 +33,7 @@ fn render_login_page(
 }
 
 async fn login(tmpl: web::Data<tera::Tera>) -> Result<impl Responder, Error> {
+    tracing::info!("Login page.!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     Ok(Html(render_login_page(tmpl, None)?))
 }
 

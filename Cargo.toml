@@ -20,3 +20,9 @@ serde={version="1", features=["derive"]}
 actix-identity="0.5"
 actix-session={version="0.7", features=["cookie-session"]}
 anyhow="1"
+tracing-actix-web = "0.7"
+tracing-bunyan-formatter = "0.3"
+tracing="0.1.37"
+tracing-subscriber={version="0.3.16", features=["env-filter", "ansi"]}
+tracing-appender="0.2.2"
+tracing-log="0.1.3"

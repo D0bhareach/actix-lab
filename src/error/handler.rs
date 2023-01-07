@@ -14,6 +14,11 @@ lazy_static!{
     );
 }
 
+        const FILE_404: &str = "44.html";
+        const FILE_500: &str = "500.html";
+
+
+// TODO: better error handling and reporting.
 // this function is not async fn? When I tried to change to async it threw.
 // Not shure do I need to have TERA in Arc?
 // I couldn't get tera instance from res.request().app_data(), that is why I have created
@@ -23,17 +28,17 @@ Result<ErrorHandlerResponse<B>> {
         // default response in case if tera won't work.
         let mut response_string = String::from(r#"
             <body>
-                <p>This is responce from raw string</p>
+                <p>This is responce from raw string. </p>
             </body>
         "#);
 
         let new_req = res.request().clone();
         let tera = TERA.clone();
-            if let Ok(tmpl) = tera.render("404.html", &tera::Context::new()){
+            if let Ok(tmpl) = tera.render(FILE_404, &tera::Context::new()){
                 response_string = tmpl;
             } else {
                 // TODO: will need to log in logging file.
-                log::error!("Can not render tera template from file")
+                tracing::error!("Can not render tera template from file {}", FILE_404)
             }
         let new_res = HttpResponseBuilder::new(StatusCode::OK).body(response_string);
 
@@ -60,7 +65,7 @@ Result<ErrorHandlerResponse<B>> {
             } else {
                 // TODO: will need to log in logging file.
                 // Do I really need this else block?
-                log::error!("Can not render tera template from file")
+                tracing::error!("Can not render tera template from file")
             }
         let new_res = HttpResponseBuilder::new(StatusCode::OK).body(response_string);
 
