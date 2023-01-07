@@ -71,6 +71,8 @@ ldnMsWhJRWvgZfdMZ6ZvYQ==";
     
     let subscriber = tracing_subscriber::fmt()
     .pretty()
+    .with_file(true)
+    .with_line_number(true)
     .with_writer(non_blocking_writer)
     .finish();
     tracing::subscriber::set_global_default(subscriber).unwrap();

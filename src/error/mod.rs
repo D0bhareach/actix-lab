@@ -4,7 +4,7 @@ use thiserror::Error as ThisError;
 
 #[derive(Debug, ThisError)]
 pub enum ActixLabError {
-    #[error("actix_lab tera template error")]
+    #[error("Tera template error. {0}")]
     TemplateError(#[from] tera::Error),
     // #[error("actix-identity error while login")]
     // IdentityLoginError,
