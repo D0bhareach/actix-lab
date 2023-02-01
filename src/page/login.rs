@@ -37,8 +37,10 @@ async fn login(tmpl: web::Data<tera::Tera>) -> Result<impl Responder, Error> {
     Ok(Html(render_login_page(tmpl, None)?))
 }
 
-async fn logout(_tmpl: web::Data<tera::Tera>, user: Identity) -> Result<impl Responder, Error> {
+async fn logout(_tmpl: web::Data<tera::Tera>, user: Option<Identity>) -> Result<impl Responder, Error> {
+    if let Some(user) = user {
     user.logout();
+    }
         Ok(HttpResponse::Found()
             .append_header(("Location", "/"))
             .finish())
