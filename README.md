@@ -1,5 +1,5 @@
 ## Agenda
-I would like to try Actix Framework. The server I would like to build must have:
+The server must have:
 * Templates.
 * Redirection on Errors.
 * Sessions.
