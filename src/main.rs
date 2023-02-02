@@ -104,6 +104,7 @@ async fn main() -> std::io::Result<()> {
         // there is one more instance of tera with exact the same settings in handlers for errors
         App::new()
             .app_data(web::Data::new(tera.clone()))
+            .app_data(web::Data::new(pool.clone()))
             .wrap(TracingLogger::default())
             .wrap(IdentityMiddleware::default())
             .wrap(

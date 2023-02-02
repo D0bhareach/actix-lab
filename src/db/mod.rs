@@ -1,7 +1,8 @@
+#[allow(dead_code)]
 mod db_home;
 use actix_web::{error, web, Error};
 // use rusqlite::Statement;
-use r2d2_sqlite::{self, SqliteConnectionManager};
+// use r2d2_sqlite::{self, SqliteConnectionManager};
 use serde::{Deserialize, Serialize};
 
 pub type Pool = r2d2::Pool<r2d2_sqlite::SqliteConnectionManager>;
@@ -9,7 +10,8 @@ pub type Connection = r2d2::PooledConnection<r2d2_sqlite::SqliteConnectionManage
 type DbEntityResult = Result<Vec<DbEntity>, rusqlite::Error>;
 
 // TODO: need my custom types here
-#[derive(Debug, Serialize, Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, PartialOrd)]
 pub enum DbEntity {
     /*
     AnnualAgg { year: i32, total: f64 },
