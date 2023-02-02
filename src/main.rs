@@ -1,5 +1,7 @@
 mod error;
 mod page;
+mod db;
+use db::Pool;
 use actix_files::Files;
 use actix_identity::IdentityMiddleware;
 use actix_session::{
@@ -17,6 +19,7 @@ use error::handler::{internal_error_handler, not_found_handler};
 use std::collections::HashMap;
 // Errors have different behaviour.
 use page::{error as err, index, login};
+use r2d2_sqlite::{self, SqliteConnectionManager};
 use rustls::{Certificate, PrivateKey, ServerConfig};
 use rustls_pemfile::{certs, pkcs8_private_keys};
 use std::{fs::File, io::BufReader};
@@ -78,6 +81,10 @@ async fn main() -> std::io::Result<()> {
     let tera =
         tera::Tera::new(concat!(env!("CARGO_MANIFEST_DIR"), "/templates/**/*.html")).unwrap();
     let tls_config = load_rustls_config(&cert_path, &key_path);
+    // connect to SQLite DB
+    let manager = SqliteConnectionManager::file("weather.db");
+    let pool = Pool::new(manager).unwrap();
+
 
     let (non_blocking_writer, _guard) = tracing_appender::non_blocking(std::io::stdout());
 

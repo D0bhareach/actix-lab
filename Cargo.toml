@@ -15,6 +15,10 @@ log = "0.4"
 tera = "1"
 lazy_static = "1.4.0"
 thiserror = "1"
+r2d2 = "0.8.10"
+# in example from actix it's stated that 0.21 blocked.
+r2d2_sqlite = "0.20"
+rusqlite = "0.27" # 0.28.0 blocked on sqlx sqlite update
 rustls = "0.20.7"
 rustls-pemfile = "1"
 serde={version="1", features=["derive"]}

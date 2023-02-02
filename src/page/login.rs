@@ -37,6 +37,7 @@ async fn login(tmpl: web::Data<tera::Tera>) -> Result<impl Responder, Error> {
     Ok(Html(render_login_page(tmpl, None)?))
 }
 
+// do I need tmpl here?
 async fn logout(_tmpl: web::Data<tera::Tera>, user: Option<Identity>) -> Result<impl Responder, Error> {
     if let Some(user) = user {
     user.logout();
