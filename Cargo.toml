@@ -12,12 +12,13 @@ actix-files = "0.6"
 env_logger = "0.10"
 dotenvy = "0.15.6"
 log = "0.4"
+# once_cell="1.17.0" # do I need lazy_static?
+# tokio={version="1", features=["sync"]}
 tera = "1"
 lazy_static = "1.4.0"
 thiserror = "1"
 r2d2 = "0.8.10"
-# in example from actix it's stated that 0.21 blocked.
-r2d2_sqlite = "0.20"
+r2d2_sqlite = "0.20" # in example from actix it's stated that 0.21 blocked.
 rusqlite = "0.27" # 0.28.0 blocked on sqlx sqlite update
 rustls = "0.20.7"
 rustls-pemfile = "1"
