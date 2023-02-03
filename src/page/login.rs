@@ -5,7 +5,6 @@ use actix_web::{
     http::StatusCode, middleware, web, Error, HttpMessage as _, HttpRequest, HttpResponse, Responder, Result, Scope,
 };
 use actix_web_lab::respond::Html;
-use log;
 use serde::Deserialize;
 use std::collections::HashMap;
 

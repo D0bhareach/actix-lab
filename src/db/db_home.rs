@@ -4,11 +4,12 @@ pub fn get_genres(conn: Connection) -> DbEntityResult {
     let mut stmt = conn.prepare(
         "SELECT Name FROM genres ORDER BY Name",
     )?;
+    // what is the result? Need vector of entities.
     stmt
         .query_map([], |row| {
             Ok(DbEntity::Genre(row.get(0)?))
         }).and_then(Iterator::collect)
-       
+
 }
 
 #[cfg(test)]

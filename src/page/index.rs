@@ -1,11 +1,13 @@
-use crate::error::ActixLabError;
+use crate::{error::ActixLabError};
 use actix_identity::Identity;
 use actix_session::Session;
 use actix_web::{web, Error, Responder, Result, Scope};
 use actix_web_lab::respond::Html;
+use crate::db;
 
 async fn hello(
     tmpl: web::Data<tera::Tera>,
+    pool: web::Data<db::Pool>,
     user: Option<Identity>,
     session: Session,
 ) -> Result<impl Responder, Error> {
@@ -19,10 +21,21 @@ async fn hello(
         // toggle login / logout button in navigation.
         ctx.insert("logged", &true);
     }
+    let genres = db::execute(&pool, db::Queries::GetGenres).await;
+    if let Ok(genres) = genres {
+        let genres = genres.iter().map(|g| {
+            match g {
+                db::DbEntity::Genre(s) => s.to_owned(),
+                _ => unreachable!()
+            }
+        } ).collect::<Vec<String>>();
+        ctx.insert("items", &genres);
+    } else {
+        tracing::info!("Home page error during getting genres. {:?}", genres);
+    }
 
     ctx.insert("name", &username);
     ctx.insert("title", "Index Page");
-    ctx.insert("items", &["templates", "middleware", "cookies"]);
     ctx.insert("text", "Welcome!");
     let res = tmpl.render("index.html", &ctx).map_err(|e| {
         log::error!("{}", e);

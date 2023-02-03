@@ -17,7 +17,6 @@ use actix_web::{
 use anyhow::Context;
 use error::handler::{internal_error_handler, not_found_handler};
 use std::collections::HashMap;
-// Errors have different behaviour.
 use page::{error as err, index, login};
 use r2d2_sqlite::{self, SqliteConnectionManager};
 use rustls::{Certificate, PrivateKey, ServerConfig};
@@ -33,7 +32,7 @@ fn get_env_var(config_map: &HashMap<String, String>, key: &str) -> Result<String
     Ok(key.to_string())
 }
 
-// TODO: add redis for holding session data.
+// TODO: add redis for holding session data.????
 
 fn load_rustls_config(cert_path: &str, key_path: &str) -> rustls::ServerConfig {
     // init server config builder with safe defaults
@@ -68,6 +67,7 @@ fn load_rustls_config(cert_path: &str, key_path: &str) -> rustls::ServerConfig {
 
 // TODO: how to test if browser is caching, how to test no-cache??
 // TODO: First test for span / domain shall be headers and cookies tests.
+// TODO: Need to think about errors. At the moment it's simple unwrap.
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     LogTracer::init().expect("Unable to setup log tracer!");
@@ -77,12 +77,13 @@ async fn main() -> std::io::Result<()> {
     let key_path = get_env_var(&configs_map, "tls_key_file").unwrap();
     let cookie_key = get_env_var(&configs_map, "cookie_key").unwrap();
     let session_ttl: i64 = get_env_var(&configs_map, "ttl").unwrap().parse().unwrap();
+    let db_file = get_env_var(&configs_map, "db_file").unwrap();
     // instances
     let tera =
         tera::Tera::new(concat!(env!("CARGO_MANIFEST_DIR"), "/templates/**/*.html")).unwrap();
     let tls_config = load_rustls_config(&cert_path, &key_path);
     // connect to SQLite DB
-    let manager = SqliteConnectionManager::file("weather.db");
+    let manager = SqliteConnectionManager::file(&db_file);
     let pool = Pool::new(manager).unwrap();
 
 

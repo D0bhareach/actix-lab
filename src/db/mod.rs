@@ -25,6 +25,9 @@ pub enum Queries {
     GetGenres,
 }
 
+// TODO: since instead of failure I prefere to have some defaults and logging this
+// method must return stright error from db. Another point do I even need such a complex
+// approach for handling db requests? Maybe do simple async methods for each req?
 pub async fn execute(pool: &Pool, query: Queries) -> Result<Vec<DbEntity>, Error> {
     let pool = pool.clone();
 
@@ -32,12 +35,12 @@ pub async fn execute(pool: &Pool, query: Queries) -> Result<Vec<DbEntity>, Error
         .await?
         .map_err(error::ErrorInternalServerError)?;
 
-    web::block(move || {
+    web::block(|| {
         match query {
-            Queries::GetGenres => db_home::get_genres(conn),
+            Queries::GetGenres =>  db_home::get_genres(conn),
         }
-    })
-    .await?
-    .map_err(error::ErrorInternalServerError)
+    }
+).await?.map_err(error::ErrorInternalServerError)
+
 
 }
