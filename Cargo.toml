@@ -11,6 +11,7 @@ actix-web-lab = "0.18"
 actix-files = "0.6"
 env_logger = "0.10"
 dotenvy = "0.15.6"
+# fallible-iterator = "0.2.0"
 log = "0.4"
 # once_cell="1.17.0" # do I need lazy_static?
 # tokio={version="1", features=["sync"]}

@@ -6,8 +6,12 @@ use thiserror::Error as ThisError;
 pub enum ActixLabError {
     #[error("Tera template error. {0}")]
     TemplateError(#[from] tera::Error),
-    // #[error("actix-identity error while login")]
-    // IdentityLoginError,
+    #[error("Database error")]
+    DbError(#[from] rusqlite::Error),
+    #[error(transparent)]
+    R2D2Error(#[from] r2d2::Error),
+    #[error(transparent)]
+    BlockingError(#[from] actix_web::error::BlockingError),
     #[error("Other severe system error")]
     Other(#[from] anyhow::Error),
 }
@@ -21,9 +25,12 @@ impl ResponseError for ActixLabError {
               ActixLabError::DatabaseError(_)
             | ActixLabError::StoreTokenError(_)
             */
-            ActixLabError::Other(_)
+            Self::DbError(_)
+            | Self::R2D2Error(_)
+            | Self::Other(_)
+            | Self::BlockingError(_)
             // | ActixLabError::IdentityLoginError
-            | ActixLabError::TemplateError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            | Self::TemplateError(_) => StatusCode::INTERNAL_SERVER_ERROR,
     
         }
     }

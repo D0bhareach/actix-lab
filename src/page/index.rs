@@ -21,20 +21,11 @@ async fn hello(
         // toggle login / logout button in navigation.
         ctx.insert("logged", &true);
     }
-    let genres = db::execute(&pool, db::Queries::GetGenres).await;
-    if let Ok(genres) = genres {
-        let genres = genres.iter().map(|g| {
-            match g {
-                db::DbEntity::Genre(s) => s.to_owned(),
-                // _ => unreachable!()
-            }
-        } ).collect::<Vec<String>>();
-        ctx.insert("items", &genres);
-    } else {
-        tracing::info!("Home page error during getting genres. {:?}", genres);
-        return Err(genres.err().unwrap());
+    let genres = db::execute(&pool, db::Queries::GetGenres).await?;
+    match genres {
+        db::DbEntity::Genre(s) => ctx.insert("items", &s),
+        // _ => unreachable!()
     }
-
     ctx.insert("name", &username);
     ctx.insert("title", "Index Page");
     ctx.insert("text", "Welcome!");
