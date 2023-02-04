@@ -32,8 +32,6 @@ fn get_env_var(config_map: &HashMap<String, String>, key: &str) -> Result<String
     Ok(key.to_string())
 }
 
-// TODO: add redis for holding session data.????
-
 fn load_rustls_config(cert_path: &str, key_path: &str) -> rustls::ServerConfig {
     // init server config builder with safe defaults
     let config = ServerConfig::builder()
@@ -65,14 +63,11 @@ fn load_rustls_config(cert_path: &str, key_path: &str) -> rustls::ServerConfig {
     config.with_single_cert(cert_chain, keys.remove(0)).unwrap()
 }
 
-// TODO: how to test if browser is caching, how to test no-cache??
-// TODO: First test for span / domain shall be headers and cookies tests.
-// TODO: Need to think about errors. At the moment it's simple unwrap.
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     LogTracer::init().expect("Unable to setup log tracer!");
     let configs_map = dotenvy::vars().collect::<HashMap<String, String>>();
-    // config variables, TODO: simple unwrap is not really enough
+
     let cert_path = get_env_var(&configs_map, "tls_cert_file").unwrap();
     let key_path = get_env_var(&configs_map, "tls_key_file").unwrap();
     let cookie_key = get_env_var(&configs_map, "cookie_key").unwrap();
@@ -89,8 +84,6 @@ async fn main() -> std::io::Result<()> {
 
     let (non_blocking_writer, _guard) = tracing_appender::non_blocking(std::io::stdout());
 
-    // TODO: Customize log messages and format?
-    // TODO: rolling files loggers.
     // TODO: not ready for production!
 
     let subscriber = tracing_subscriber::fmt()

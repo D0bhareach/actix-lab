@@ -4,12 +4,16 @@ pub fn get_genres(conn: Connection) -> DbEntityResult {
     let mut stmt = conn.prepare(
         "SELECT Name FROM genres ORDER BY Name",
     )?;
-    // what is the result? Need vector of entities.
-    stmt
-        .query_map([], |row| {
-            Ok(DbEntity::Genre(row.get(0)?))
-        }).and_then(Iterator::collect)
 
+    // couldn't use provided methods complaining when use get.
+    // let mut rows = stmt.query_map([], |row| row.get::<String>(0i64)?);
+    // let res: Vec<String> = rows.mapped(|row| row.get(0)? as String).collect();
+    let mut rows = stmt.query([])?;
+    let mut res = Vec::new();
+    while let Some(row) = rows.next()? {
+        res.push(row.get(0)?);
+    }
+    Ok(DbEntity::Genre(res))
 }
 
 #[cfg(test)]
@@ -28,34 +32,34 @@ fn get_genres_test(){
     let pool = get_pool();
     let conn = pool.get().unwrap();
     let res = get_genres(conn).unwrap();
+    // instead of writing long vec probably should rather take few items by index and check. 
     let expect = vec![
-        DbEntity::Genre("Alternative".to_string()),
-        DbEntity::Genre("Alternative & Punk".to_string()),
-        DbEntity::Genre("Blues".to_string()),
-        DbEntity::Genre("Bossa Nova".to_string()),
-        DbEntity::Genre("Classical".to_string()),
-        DbEntity::Genre("Comedy".to_string()),
-        DbEntity::Genre("Drama".to_string()),
-        DbEntity::Genre("Easy Listening".to_string()),
-        DbEntity::Genre("Electronica/Dance".to_string()),
-        DbEntity::Genre("Heavy Metal".to_string()),
-        DbEntity::Genre("Hip Hop/Rap".to_string()),
-        DbEntity::Genre("Jazz".to_string()),
-        DbEntity::Genre("Latin".to_string()),
-        DbEntity::Genre("Metal".to_string()),
-        DbEntity::Genre("Opera".to_string()),
-        DbEntity::Genre("Pop".to_string()),
-        DbEntity::Genre("R&B/Soul".to_string()),
-        DbEntity::Genre("Reggae".to_string()),
-        DbEntity::Genre("Rock".to_string()),
-        DbEntity::Genre("Rock And Roll".to_string()),
-        DbEntity::Genre("Sci Fi & Fantasy".to_string()),
-        DbEntity::Genre("Science Fiction".to_string()),
-        DbEntity::Genre("Soundtrack".to_string()),
-        DbEntity::Genre("TV Shows".to_string()),
-        DbEntity::Genre("World".to_string()),
+        "Alternative".to_string(),
+        "Alternative & Punk".to_string(),
+        "Blues".to_string(),
+        "Bossa Nova".to_string(),
+        "Classical".to_string(),
+        "Comedy".to_string(),
+        "Drama".to_string(),
+        "Easy Listening".to_string(),
+        "Electronica/Dance".to_string(),
+        "Heavy Metal".to_string(),
+        "Hip Hop/Rap".to_string(),
+        "Jazz".to_string(),
+        "Latin".to_string(),
+        "Metal".to_string(),
+        "Opera".to_string(),
+        "Pop".to_string(),
+        "R&B/Soul".to_string(),
+        "Reggae".to_string(),
+        "Rock".to_string(),
+        "Rock And Roll".to_string(),
+        "Sci Fi & Fantasy".to_string(),
+        "Science Fiction".to_string(),
+        "Soundtrack".to_string(),
+        "TV Shows".to_string(),
+        "World".to_string(),
 ];
-    assert_eq!(res, expect);
+    assert_eq!(res, DbEntity::Genre(expect));
 }
-// prepare connections.
 }
